@@ -1,0 +1,26 @@
+{
+    "assets": [
+        "AAPL",
+        "MSFT", 
+        "GOOGL",
+        "AMZN",
+        "TSLA"
+    ],
+    "target_weights": {
+        "AAPL": 0.2,
+        "MSFT": 0.2,
+        "GOOGL": 0.2,
+        "AMZN": 0.2,
+        "TSLA": 0.2
+    },
+    "rebalance_threshold": 0.05,
+    "min_rebalance_interval_days": 7,
+    "max_asset_weight": 0.20,
+    "min_asset_weight": 0.01,
+    "critical_drop_threshold": -30.0,
+    "transaction_cost_rate": 0.001,
+    "backtest_period": {
+        "start_date": "2022-01-01",
+        "end_date": "2023-01-01"
+    }
+}
