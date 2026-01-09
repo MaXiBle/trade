@@ -1,21 +1,23 @@
-```gitignore
-# Compiled and binary files
+```
+# Compiled and build artifacts
 *.pyc
 __pycache__/
+*.o
+*.obj
+*.so
+*.dll
+*.exe
+*.class
+*.out
 
 # Dependencies
-venv/
 .venv/
+venv/
 .env
 .env.local
-*.env.*
+.env.*
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# Logs and temporary files
+# Logs and temp files
 *.log
 *.tmp
 *.swp
@@ -24,18 +26,17 @@ dist/
 .vscode/
 .idea/
 
-# Coverage reports
+# Coverage
 .coverage
 coverage/
 htmlcov/
 
-# Python cache
-.mypy_cache/
+# Testing
 .pytest_cache/
-*.pyo
-*.pyd
+.mypy_cache/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Distribution
+dist/
+build/
+target/
 ```

@@ -1,34 +1,34 @@
-# Automated Portfolio Management System
+# Система автоматического управления инвестиционным портфелем
 
-## Project Overview
-An automated system for managing a diversified investment portfolio with dynamic rebalancing and contracyclical capital reallocation strategies.
+## Обзор проекта
+Автоматизированная система управления диверсифицированным инвестиционным портфелем с использованием стратегии динамической ребалансировки и контрциклического перераспределения капитала.
 
-## Features
-- Portfolio monitoring with real-time market data
-- Dynamic rebalancing based on target weights
-- Risk management controls
-- Backtesting module with performance metrics
-- Configurable strategy parameters
-- Modular architecture ready for broker API integration
+## Возможности
+- Мониторинг портфеля с использованием рыночных данных в реальном времени
+- Динамическая ребалансировка на основе целевых весов
+- Управление рисками
+- Модуль бэктестирования с показателями эффективности
+- Настраиваемые параметры стратегии
+- Модульная архитектура, готовая к интеграции с API брокера
 
-## Architecture
-The system consists of several modules:
-- Data loading module
-- Signal calculation module
-- Operation execution module
-- Backtesting module
-- Configuration management
+## Архитектура
+Система состоит из нескольких модулей:
+- Модуль загрузки данных
+- Модуль вычисления сигналов
+- Модуль выполнения операций
+- Модуль бэктестирования
+- Управление конфигурацией
 
-## Installation
+## Установка
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+## Использование
 ```python
 from src.portfolio_manager import PortfolioManager
 
-# Initialize with configuration
+# Инициализация с конфигурацией
 manager = PortfolioManager(config_file='config/default_config.json')
 manager.run()
 ```
