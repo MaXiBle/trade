@@ -1,23 +1,81 @@
 #!/usr/bin/env python3
 """
-Демонстрационный скрипт для модуля бэктестирования
-Симулирует стратегию управления портфелем на исторических рыночных данных
+Модуль тестирования для симуляции рынка на исторических данных
 """
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from src.backtester import Backtester
+import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
-import json
+from src.backtester import Backtester
+from src.data_loader import DataLoader
+import matplotlib.pyplot as plt
 
 
-def main():
-    print("Система управления инвестиционным портфелем - Демонстрация бэктестирования")
+def simulate_market_over_interval(symbols, start_date, end_date):
+    """
+    Симуляция рынка за заданный исторический интервал
+    
+    Args:
+        symbols: Список тикеров акций
+        start_date: Начальная дата (ГГГГ-ММ-ДД)
+        end_date: Конечная дата (ГГГГ-ММ-ДД)
+        
+    Returns:
+        DataFrame с историческими данными цен
+    """
+    print(f"Симуляция рынка для {symbols} с {start_date} по {end_date}")
+    
+    # Загрузка исторических данных
+    data_loader = DataLoader()
+    price_data = data_loader.get_historical_data(symbols, start_date, end_date)
+    
+    if price_data.empty:
+        print("Нет исторических данных для симуляции")
+        return pd.DataFrame()
+    
+    # Расчет доходностей
+    returns_data = price_data.pct_change().dropna()
+    
+    print(f"Данные охвата: {len(price_data)} торговых дней")
+    print(f"Диапазон дат: {price_data.index[0]} до {price_data.index[-1]}")
+    print("\nСтатистика по активам:")
+    
+    for symbol in symbols:
+        if symbol in price_data.columns:
+            prices = price_data[symbol].dropna()
+            returns = returns_data[symbol].dropna()
+            
+            print(f"\n{symbol}:")
+            print(f"  Начальная цена: ${prices.iloc[0]:.2f}")
+            print(f"  Конечная цена: ${prices.iloc[-1]:.2f}")
+            print(f"  Общая доходность: {(prices.iloc[-1]/prices.iloc[0] - 1):.2%}")
+            print(f"  Средняя доходность: {returns.mean():.2%}")
+            print(f"  Волатильность: {returns.std():.2%}")
+            print(f"  Максимальная просадка: {calculate_max_drawdown(prices):.2%}")
+    
+    return price_data
+
+
+def calculate_max_drawdown(price_series):
+    """Расчет максимальной просадки"""
+    rolling_max = price_series.expanding().max()
+    drawdown = (price_series - rolling_max) / rolling_max
+    return drawdown.min()
+
+
+def run_portfolio_simulation_test():
+    """
+    Запуск теста симуляции портфеля на исторических данных
+    """
+    print("="*70)
+    print("ТЕСТИРОВАНИЕ СИМУЛЯЦИИ РЫНКА НА ИСТОРИЧЕСКИХ ДАННЫХ")
     print("="*70)
     
-    # Определение конфигурации для бэктеста
+    # Определение конфигурации для теста
     config = {
         'rebalance_threshold': 0.05,      # Ребалансировка при отклонении веса более чем на 5%
         'min_rebalance_interval_days': 7, # Минимум 7 дней между ребалансировками
@@ -33,26 +91,32 @@ def main():
         }
     }
     
-    # Создание экземпляра бэктестера
-    backtester = Backtester(config)
-    
-    # Определение символов портфеля и временного периода
+    # Тестовые символы и временной период
     symbols = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA']
     start_date = '2020-01-01'
     end_date = '2023-01-01'
     
-    print(f"Тестируемый портфель: {', '.join(symbols)}")
-    print(f"Период бэктестирования: {start_date} до {end_date}")
-    print(f"Начальное распределение: Равные веса (по 20% каждый)")
-    print()
+    # Симуляция рынка
+    market_data = simulate_market_over_interval(symbols, start_date, end_date)
+    
+    if market_data.empty:
+        print("Невозможно провести тест из-за отсутствия данных")
+        return
+    
+    print("\n" + "="*70)
+    print("ТЕСТИРОВАНИЕ СТРАТЕГИИ РЕБАЛАНСИРОВКИ НА ИСТОРИЧЕСКИХ ДАННЫХ")
+    print("="*70)
+    
+    # Создание экземпляра бэктестера
+    backtester = Backtester(config)
     
     try:
         # Запуск бэктеста
-        print("Запуск бэктестирования...")
+        print(f"Запуск симуляции портфельной стратегии с {start_date} по {end_date}...")
         results = backtester.run_backtest(symbols, start_date, end_date)
         
         # Отображение результатов
-        print("\nРезультаты бэктестирования:")
+        print("\nРЕЗУЛЬТАТЫ СИМУЛЯЦИИ:")
         print("-" * 50)
         
         # Общее изменение баланса портфеля
@@ -98,7 +162,7 @@ def main():
         print(f"Количество ребалансировок:                 {results['num_rebalances']}")
         
         # Генерация подробного отчета
-        print("\nПодробный отчет:")
+        print("\nПОДРОБНЫЙ ОТЧЕТ:")
         print("=" * 70)
         report = backtester.generate_report()
         print(report)
@@ -107,16 +171,17 @@ def main():
         # backtester.plot_results()
         
     except Exception as e:
-        print(f"Ошибка во время бэктестирования: {str(e)}")
+        print(f"Ошибка во время симуляции: {str(e)}")
         import traceback
         traceback.print_exc()
 
 
-def simple_backtest_example():
+def run_simple_simulation():
     """
-    Упрощенный пример, демонстрирующий базовую функциональность бэктестирования
+    Запуск простой симуляции для быстрой проверки
     """
-    print("\nПростой пример бэктестирования")
+    print("\n" + "="*50)
+    print("ПРОСТАЯ СИМУЛЯЦИЯ РЫНКА")
     print("="*50)
     
     # Простая конфигурация с равными весами
@@ -134,21 +199,27 @@ def simple_backtest_example():
     start_date = '2021-01-01'
     end_date = '2022-01-01'
     
-    print(f"Тестирование: {', '.join(symbols)} с {start_date} по {end_date}")
+    print(f"Симуляция: {', '.join(symbols)} с {start_date} по {end_date}")
     
     try:
+        # Сначала симуляция рынка
+        simulate_market_over_interval(symbols, start_date, end_date)
+        
+        # Затем тест стратегии
         results = backtester.run_backtest(symbols, start_date, end_date)
         
-        print(f"\nРезультаты:")
+        print(f"\nРЕЗУЛЬТАТЫ СИМУЛЯЦИИ:")
         print(f"Доходность портфеля (с ребалансировкой): {results['total_return']:.2%}")
         print(f"Доходность бенчмарка:                    {results['benchmark_total_return']:.2%}")
         print(f"Избыточная доходность:                   {results['total_return'] - results['benchmark_total_return']:.2%}")
         print(f"Количество ребалансировок:               {results['num_rebalances']}")
+        print(f"Максимальная просадка (портфель):        {results['max_drawdown']:.2%}")
+        print(f"Максимальная просадка (бенчмарк):        {results['benchmark_max_drawdown']:.2%}")
         
     except Exception as e:
         print(f"Ошибка: {str(e)}")
 
 
 if __name__ == "__main__":
-    main()
-    simple_backtest_example()
+    run_portfolio_simulation_test()
+    run_simple_simulation()

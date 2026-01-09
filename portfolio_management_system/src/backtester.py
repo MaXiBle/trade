@@ -1,6 +1,6 @@
 """
-Backtesting module for portfolio management system
-Tests the rebalancing strategy on historical data
+Модуль бэктестирования для системы управления портфелем
+Тестирует стратегию ребалансировки на исторических данных
 """
 
 import pandas as pd
@@ -14,15 +14,15 @@ import yfinance as yf
 
 class Backtester:
     """
-    Class for backtesting portfolio strategies on historical data
+    Класс для бэктестирования стратегий портфеля на исторических данных
     """
     
     def __init__(self, config: dict):
         """
-        Initialize backtester with configuration
+        Инициализация бэктестера с конфигурацией
         
         Args:
-            config: Configuration dictionary
+            config: Словарь конфигурации
         """
         self.config = config
         self.results = {}
@@ -32,65 +32,65 @@ class Backtester:
     
     def run_backtest(self, symbols: List[str], start_date: str, end_date: str) -> Dict:
         """
-        Run backtest of the portfolio strategy
+        Запуск бэктеста стратегии портфеля
         
         Args:
-            symbols: List of stock symbols to include in portfolio
-            start_date: Start date for backtest (YYYY-MM-DD)
-            end_date: End date for backtest (YYYY-MM-DD)
+            symbols: Список тикеров акций для включения в портфель
+            start_date: Начальная дата бэктеста (ГГГГ-ММ-ДД)
+            end_date: Конечная дата бэктеста (ГГГГ-ММ-ДД)
             
         Returns:
-            Dictionary with backtest results
+            Словарь с результатами бэктеста
         """
-        print(f"Running backtest from {start_date} to {end_date}")
+        print(f"Запуск бэктеста с {start_date} по {end_date}")
         
-        # Load historical data
+        # Загрузка исторических данных
         from .data_loader import DataLoader
         data_loader = DataLoader()
         price_data = data_loader.get_historical_data(symbols, start_date, end_date)
         
         if price_data.empty:
-            raise ValueError("No historical data available for backtesting")
+            raise ValueError("Нет исторических данных для бэктестирования")
         
-        # Calculate daily returns
+        # Расчет ежедневной доходности
         returns_data = price_data.pct_change().dropna()
         
-        # Initialize portfolio weights (equal weights or from config)
+        # Инициализация начальных весов портфеля (равные веса или из конфига)
         if 'initial_weights' in self.config:
             initial_weights = self.config['initial_weights']
         else:
             n_assets = len(symbols)
             initial_weights = {symbol: 1.0/n_assets for symbol in symbols}
         
-        # Initialize risk parameters
-        max_weight_limit = self.config.get('max_weight_limit', 0.20)  # 20% max per asset
-        critical_drop_threshold = self.config.get('critical_drop_threshold', -0.30)  # -30% threshold
-        rebalance_threshold = self.config.get('rebalance_threshold', 0.05)  # 5% threshold
-        min_rebalance_interval = self.config.get('min_rebalance_interval_days', 7)  # 7 days
-        transaction_cost = self.config.get('transaction_cost', 0.001)  # 0.1% per transaction
+        # Инициализация параметров риска
+        max_weight_limit = self.config.get('max_weight_limit', 0.20)  # максимум 20% на актив
+        critical_drop_threshold = self.config.get('critical_drop_threshold', -0.30)  # порог -30%
+        rebalance_threshold = self.config.get('rebalance_threshold', 0.05)  # порог 5%
+        min_rebalance_interval = self.config.get('min_rebalance_interval_days', 7)  # 7 дней
+        transaction_cost = self.config.get('transaction_cost', 0.001)  # 0.1% за транзакцию
         
-        # Simulate portfolio performance over time
+        # Симуляция производительности портфеля во времени
         portfolio_values = []
         portfolio_weights_history = []
         rebalance_dates = []
         
-        # Starting value
+        # Начальное значение
         current_weights = initial_weights.copy()
-        initial_value = 100000  # $100k starting capital
+        initial_value = 100000  # начальный капитал $100k
         current_value = initial_value
         last_rebalance_date = None
         
-        # Iterate through each day
+        # Итерация по каждому дню
         for date_idx in range(len(returns_data)):
             current_date = returns_data.index[date_idx]
             
-            # Calculate portfolio return for this day based on yesterday's weights
+            # Расчет доходности портфеля за этот день на основе вчерашних весов
             day_return = 0
             for symbol in symbols:
                 if symbol in returns_data.columns:
                     day_return += current_weights.get(symbol, 0) * returns_data.iloc[date_idx][symbol]
             
-            # Update portfolio value
+            # Обновление стоимости портфеля
             current_value *= (1 + day_return)
             portfolio_values.append({
                 'date': current_date,
@@ -98,7 +98,7 @@ class Backtester:
                 'return': day_return
             })
             
-            # Store portfolio history
+            # Сохранение истории портфеля
             self.portfolio_history.append({
                 'date': current_date,
                 'value': current_value,
@@ -106,11 +106,11 @@ class Backtester:
                 'weights': current_weights.copy()
             })
             
-            # Calculate benchmark value (buy and hold without rebalancing)
+            # Расчет стоимости бенчмарка (покупка и удержание без ребалансировки)
             if date_idx == 0:
                 benchmark_value = initial_value
             else:
-                benchmark_return = returns_data.iloc[date_idx].mean()  # Equal weighted benchmark
+                benchmark_return = returns_data.iloc[date_idx].mean()  # равновзвешенный бенчмарк
                 benchmark_value *= (1 + benchmark_return)
             
             self.benchmark_history.append({
@@ -118,17 +118,17 @@ class Backtester:
                 'value': benchmark_value
             })
             
-            # Check if rebalancing is needed (after the first day)
+            # Проверка необходимости ребалансировки (после первого дня)
             if date_idx > 0:
-                # Calculate current weights based on performance
+                # Расчет текущих весов на основе производительности
                 current_prices = price_data.loc[current_date]
                 prev_prices = price_data.iloc[date_idx-1]
                 
-                # Calculate current market values and weights
+                # Расчет текущих рыночных стоимостей и весов
                 market_values = {}
                 for symbol in symbols:
                     if symbol in current_prices and symbol in prev_prices:
-                        # Calculate the value of each asset based on the portfolio value and returns
+                        # Расчет стоимости актива на основе стоимости портфеля и доходности
                         prev_weight = current_weights.get(symbol, initial_weights.get(symbol, 0))
                         price_return = (current_prices[symbol] / prev_prices[symbol]) - 1
                         new_value = current_value * prev_weight * (1 + price_return)
@@ -140,21 +140,21 @@ class Backtester:
                 else:
                     actual_weights = current_weights.copy()
                 
-                # Check if any asset has dropped critically (more than -30% in a month)
+                # Проверка, упал ли какой-либо актив критически (более чем на -30% за месяц)
                 should_skip_rebalance = False
-                if date_idx >= 22:  # At least a month of data
+                if date_idx >= 22:  # По крайней мере месяц данных
                     for symbol in symbols:
                         if symbol in price_data.columns:
-                            # Calculate monthly return
-                            month_ago_idx = date_idx - 22  # Approximate month
+                            # Расчет месячной доходности
+                            month_ago_idx = date_idx - 22  # Приблизительно месяц
                             if month_ago_idx >= 0:
                                 month_return = (current_prices[symbol] / price_data.iloc[month_ago_idx][symbol]) - 1
                                 if month_return < critical_drop_threshold:
-                                    print(f"Critical drop detected for {symbol}: {month_return:.2%}, skipping rebalance")
+                                    print(f"Обнаружено критическое падение для {symbol}: {month_return:.2%}, пропускаем ребалансировку")
                                     should_skip_rebalance = True
                                     break
                 
-                # Check if rebalancing conditions are met
+                # Проверка условий ребалансировки
                 days_since_last_rebalance = (
                     (current_date - last_rebalance_date).days 
                     if last_rebalance_date else float('inf')
@@ -172,23 +172,23 @@ class Backtester:
                 )
                 
                 if should_rebalance:
-                    # Apply risk management constraints to target weights
+                    # Применение ограничений риска к целевым весам
                     adjusted_weights = self._apply_risk_constraints(actual_weights, initial_weights, max_weight_limit)
                     
-                    # Calculate transaction costs
+                    # Расчет транзакционных издержек
                     weight_changes = {s: abs(adjusted_weights.get(s, 0) - current_weights.get(s, 0)) 
                                       for s in symbols}
                     total_transaction_cost = sum(weight_changes.values()) * transaction_cost
                     
-                    # Apply transaction costs to portfolio value
+                    # Применение транзакционных издержек к стоимости портфеля
                     current_value *= (1 - total_transaction_cost)
                     
-                    # Update weights after rebalancing
+                    # Обновление весов после ребалансировки
                     current_weights = adjusted_weights
                     last_rebalance_date = current_date
                     rebalance_dates.append(current_date)
                     
-                    # Store rebalance event
+                    # Сохранение события ребалансировки
                     self.rebalance_history.append({
                         'date': current_date,
                         'previous_weights': actual_weights.copy(),
@@ -198,14 +198,14 @@ class Backtester:
             
             portfolio_weights_history.append(current_weights.copy())
         
-        # Convert to DataFrame
+        # Преобразование в DataFrame
         portfolio_df = pd.DataFrame(portfolio_values)
         portfolio_df.set_index('date', inplace=True)
         
         benchmark_df = pd.DataFrame(self.benchmark_history)
         benchmark_df.set_index('date', inplace=True)
         
-        # Calculate performance metrics
+        # Расчет метрик производительности
         self.results = self._calculate_metrics(portfolio_df, benchmark_df, rebalance_dates)
         
         return self.results
@@ -213,30 +213,30 @@ class Backtester:
     def _apply_risk_constraints(self, current_weights: Dict[str, float], target_weights: Dict[str, float], 
                                max_weight_limit: float) -> Dict[str, float]:
         """
-        Apply risk management constraints to rebalancing weights
+        Применение ограничений управления рисками к весам ребалансировки
         
         Args:
-            current_weights: Current portfolio weights
-            target_weights: Target weights for rebalancing
-            max_weight_limit: Maximum allowed weight for any single asset
+            current_weights: Текущие веса портфеля
+            target_weights: Целевые веса для ребалансировки
+            max_weight_limit: Максимально допустимый вес для любого актива
             
         Returns:
-            Adjusted weights that comply with risk constraints
+            Скорректированные веса, соответствующие ограничениям риска
         """
         adjusted_weights = target_weights.copy()
         
-        # Ensure no asset exceeds maximum weight limit
+        # Обеспечение того, что ни один актив не превышает максимальный лимит веса
         for symbol, weight in adjusted_weights.items():
             if weight > max_weight_limit:
                 adjusted_weights[symbol] = max_weight_limit
         
-        # Renormalize weights if they exceed 100%
+        # Нормализация весов, если они превышают 100%
         total_weight = sum(adjusted_weights.values())
         if total_weight > 1:
             for symbol in adjusted_weights:
                 adjusted_weights[symbol] /= total_weight
         
-        # Ensure all weights are positive and sum to 1
+        # Обеспечение всех весов положительными и суммирующимися в 1
         for symbol in adjusted_weights:
             if adjusted_weights[symbol] < 0:
                 adjusted_weights[symbol] = 0
@@ -251,34 +251,34 @@ class Backtester:
     def _calculate_metrics(self, portfolio_data: pd.DataFrame, benchmark_data: pd.DataFrame, 
                           rebalance_dates: List) -> Dict:
         """
-        Calculate performance metrics from backtest results
+        Расчет метрик производительности из результатов бэктеста
         
         Args:
-            portfolio_data: DataFrame with portfolio value history
-            benchmark_data: DataFrame with benchmark value history
-            rebalance_dates: List of dates when rebalancing occurred
+            portfolio_data: DataFrame с историей стоимости портфеля
+            benchmark_data: DataFrame с историей стоимости бенчмарка
+            rebalance_dates: Список дат, когда происходила ребалансировка
             
         Returns:
-            Dictionary with performance metrics
+            Словарь с метриками производительности
         """
-        # Portfolio returns
+        # Доходность портфеля
         portfolio_returns = portfolio_data['value'].pct_change().dropna()
         benchmark_returns = benchmark_data['value'].pct_change().dropna()
         
-        # Total return
+        # Общая доходность
         total_return = (portfolio_data['value'].iloc[-1] / portfolio_data['value'].iloc[0]) - 1
         benchmark_total_return = (benchmark_data['value'].iloc[-1] / benchmark_data['value'].iloc[0]) - 1
         
-        # Annualized return (assuming 252 trading days per year)
+        # Годовая доходность (предполагаем 252 торговых дня в году)
         years = len(portfolio_data) / 252
         annualized_return = (portfolio_data['value'].iloc[-1] / portfolio_data['value'].iloc[0]) ** (1/years) - 1 if years > 0 else 0
         benchmark_annualized_return = (benchmark_data['value'].iloc[-1] / benchmark_data['value'].iloc[0]) ** (1/years) - 1 if years > 0 else 0
         
-        # Volatility (annualized)
+        # Волатильность (годовая)
         volatility = portfolio_returns.std() * np.sqrt(252)
         benchmark_volatility = benchmark_returns.std() * np.sqrt(252)
         
-        # Maximum drawdown
+        # Максимальная просадка
         rolling_max = portfolio_data['value'].expanding().max()
         daily_drawdown = portfolio_data['value'] / rolling_max - 1
         max_drawdown = daily_drawdown.min()
@@ -287,23 +287,23 @@ class Backtester:
         benchmark_daily_drawdown = benchmark_data['value'] / benchmark_rolling_max - 1
         benchmark_max_drawdown = benchmark_daily_drawdown.min()
         
-        # Sharpe ratio (assuming risk-free rate of 0 for simplicity)
+        # Коэффициент Шарпа (предполагаем нулевую безрисковую ставку для простоты)
         sharpe_ratio = annualized_return / volatility if volatility != 0 else 0
         benchmark_sharpe = benchmark_annualized_return / benchmark_volatility if benchmark_volatility != 0 else 0
         
-        # Number of rebalancing events
+        # Количество событий ребалансировки
         num_rebalances = len(rebalance_dates)
         
-        # Alpha and Beta calculation
-        # Covariance of portfolio and benchmark returns
+        # Альфа и Бета расчет
+        # Ковариация доходности портфеля и бенчмарка
         covariance = np.cov(portfolio_returns, benchmark_returns)[0][1]
         benchmark_variance = np.var(benchmark_returns)
         beta = covariance / benchmark_variance if benchmark_variance != 0 else 0
         
-        # Alpha (excess return over what CAPM predicts)
-        alpha = annualized_return - (0 + beta * (benchmark_annualized_return - 0))  # Assuming 0% risk-free rate
+        # Альфа (избыточная доходность над тем, что предсказывает CAPM)
+        alpha = annualized_return - (0 + beta * (benchmark_annualized_return - 0))  # Предполагаем 0% безрисковую ставку
         
-        # Information ratio
+        # Информационное соотношение
         excess_returns = portfolio_returns - benchmark_returns
         tracking_error = excess_returns.std() * np.sqrt(252)
         information_ratio = (annualized_return - benchmark_annualized_return) / tracking_error if tracking_error != 0 else 0
@@ -328,64 +328,64 @@ class Backtester:
     
     def plot_results(self, save_path: str = None):
         """
-        Plot backtest results
+        Построение результатов бэктеста
         
         Args:
-            save_path: Optional path to save the plot
+            save_path: Необязательный путь для сохранения графика
         """
         if not self.results or not self.portfolio_history:
-            print("No backtest results to plot. Run backtest first.")
+            print("Нет результатов бэктеста для построения. Сначала запустите бэктест.")
             return
         
-        # Convert history to DataFrames for plotting
+        # Преобразование истории в DataFrame для построения
         portfolio_df = pd.DataFrame(self.portfolio_history)
         portfolio_df.set_index('date', inplace=True)
         
         benchmark_df = pd.DataFrame(self.benchmark_history)
         benchmark_df.set_index('date', inplace=True)
         
-        # Create subplots
+        # Создание подграфиков
         fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-        fig.suptitle('Portfolio Backtesting Results', fontsize=16)
+        fig.suptitle('Результаты бэктестирования портфеля', fontsize=16)
         
-        # Plot 1: Portfolio vs Benchmark Performance
-        axes[0, 0].plot(portfolio_df.index, portfolio_df['value'], label='Rebalanced Portfolio', linewidth=2)
-        axes[0, 0].plot(benchmark_df.index, benchmark_df['value'], label='Buy & Hold Benchmark', linewidth=2)
-        axes[0, 0].set_title('Portfolio Value Over Time')
-        axes[0, 0].set_xlabel('Date')
-        axes[0, 0].set_ylabel('Portfolio Value ($)')
+        # График 1: Производительность портфеля и бенчмарка
+        axes[0, 0].plot(portfolio_df.index, portfolio_df['value'], label='Портфель с ребалансировкой', linewidth=2)
+        axes[0, 0].plot(benchmark_df.index, benchmark_df['value'], label='Бенчмарк покупки и удержания', linewidth=2)
+        axes[0, 0].set_title('Стоимость портфеля со временем')
+        axes[0, 0].set_xlabel('Дата')
+        axes[0, 0].set_ylabel('Стоимость портфеля ($)')
         axes[0, 0].legend()
         axes[0, 0].grid(True, alpha=0.3)
         
-        # Add rebalance markers if any occurred
+        # Добавление маркеров ребалансировки, если они есть
         if self.rebalance_history:
             rebalance_dates = [r['date'] for r in self.rebalance_history]
             rebalance_values = [portfolio_df.loc[r['date']]['value'] for r in self.rebalance_history]
-            axes[0, 0].scatter(rebalance_dates, rebalance_values, color='red', marker='^', s=50, label='Rebalance Points')
+            axes[0, 0].scatter(rebalance_dates, rebalance_values, color='red', marker='^', s=50, label='Точки ребалансировки')
         
-        # Plot 2: Drawdown chart
+        # График 2: График просадки
         portfolio_rolling_max = portfolio_df['value'].expanding().max()
         portfolio_drawdown = (portfolio_df['value'] - portfolio_rolling_max) / portfolio_rolling_max
         benchmark_rolling_max = benchmark_df['value'].expanding().max()
         benchmark_drawdown = (benchmark_df['value'] - benchmark_rolling_max) / benchmark_rolling_max
         
-        axes[0, 1].fill_between(portfolio_df.index, portfolio_drawdown * 100, 0, alpha=0.3, color='blue', label='Portfolio Drawdown')
-        axes[0, 1].fill_between(benchmark_df.index, benchmark_drawdown * 100, 0, alpha=0.3, color='orange', label='Benchmark Drawdown')
-        axes[0, 1].set_title('Drawdown Comparison')
-        axes[0, 1].set_xlabel('Date')
-        axes[0, 1].set_ylabel('Drawdown (%)')
+        axes[0, 1].fill_between(portfolio_df.index, portfolio_drawdown * 100, 0, alpha=0.3, color='blue', label='Просадка портфеля')
+        axes[0, 1].fill_between(benchmark_df.index, benchmark_drawdown * 100, 0, alpha=0.3, color='orange', label='Просадка бенчмарка')
+        axes[0, 1].set_title('Сравнение просадки')
+        axes[0, 1].set_xlabel('Дата')
+        axes[0, 1].set_ylabel('Просадка (%)')
         axes[0, 1].legend()
         axes[0, 1].grid(True, alpha=0.3)
-        axes[0, 1].invert_yaxis()  # Invert y-axis so drawdowns show as negative values below zero
+        axes[0, 1].invert_yaxis()  # Инвертировать ось y, чтобы просадки отображались как отрицательные значения ниже нуля
         
-        # Plot 3: Asset weights over time (if we have weight history)
+        # График 3: Веса активов со временем (если есть история весов)
         if len(self.portfolio_history) > 0 and 'weights' in self.portfolio_history[0]:
-            # Get all unique symbols from weights
+            # Получение всех уникальных символов из весов
             all_symbols = set()
             for entry in self.portfolio_history:
                 all_symbols.update(entry['weights'].keys())
             
-            # Create a DataFrame for weights over time
+            # Создание DataFrame для весов со временем
             weight_data = {}
             for symbol in all_symbols:
                 weight_data[symbol] = []
@@ -396,17 +396,17 @@ class Backtester:
             
             weight_df = pd.DataFrame(weight_data, index=portfolio_df.index)
             
-            # Plot weights over time
+            # Построение весов со временем
             for symbol in all_symbols:
                 axes[1, 0].plot(weight_df.index, weight_df[symbol], label=symbol)
-            axes[1, 0].set_title('Asset Weights Over Time')
-            axes[1, 0].set_xlabel('Date')
-            axes[1, 0].set_ylabel('Weight')
+            axes[1, 0].set_title('Веса активов со временем')
+            axes[1, 0].set_xlabel('Дата')
+            axes[1, 0].set_ylabel('Вес')
             axes[1, 0].legend()
             axes[1, 0].grid(True, alpha=0.3)
         
-        # Plot 4: Performance metrics comparison
-        metrics_labels = ['Total Return', 'Annualized Return', 'Sharpe Ratio', 'Max Drawdown']
+        # График 4: Сравнение метрик производительности
+        metrics_labels = ['Общая доходность', 'Годовая доходность', 'Коэффициент Шарпа', 'Максимальная просадка']
         portfolio_metrics = [
             self.results['total_return'],
             self.results['annualized_return'],
@@ -423,11 +423,11 @@ class Backtester:
         x = np.arange(len(metrics_labels))
         width = 0.35
         
-        axes[1, 1].bar(x - width/2, portfolio_metrics, width, label='Rebalanced Portfolio', alpha=0.8)
-        axes[1, 1].bar(x + width/2, benchmark_metrics, width, label='Buy & Hold Benchmark', alpha=0.8)
-        axes[1, 1].set_title('Performance Metrics Comparison')
-        axes[1, 1].set_xlabel('Metrics')
-        axes[1, 1].set_ylabel('Value')
+        axes[1, 1].bar(x - width/2, portfolio_metrics, width, label='Портфель с ребалансировкой', alpha=0.8)
+        axes[1, 1].bar(x + width/2, benchmark_metrics, width, label='Бенчмарк покупки и удержания', alpha=0.8)
+        axes[1, 1].set_title('Сравнение метрик производительности')
+        axes[1, 1].set_xlabel('Метрики')
+        axes[1, 1].set_ylabel('Значение')
         axes[1, 1].set_xticks(x)
         axes[1, 1].set_xticklabels(metrics_labels, rotation=45, ha='right')
         axes[1, 1].legend()
@@ -437,60 +437,60 @@ class Backtester:
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"Plot saved to {save_path}")
+            print(f"График сохранен в {save_path}")
         
         plt.show()
     
     def generate_report(self) -> str:
         """
-        Generate a text report of backtesting results
+        Генерация текстового отчета результатов бэктестирования
         
         Returns:
-            Formatted string with backtesting results
+            Отформатированная строка с результатами бэктестирования
         """
         if not self.results:
-            return "No backtest results available. Run backtest first."
+            return "Нет результатов бэктеста. Сначала запустите бэктест."
         
         report = []
         report.append("="*60)
-        report.append("PORTFOLIO BACKTESTING REPORT")
+        report.append("ОТЧЕТ О БЭКТЕСТЕ ПОРТФЕЛЯ")
         report.append("="*60)
         
-        report.append(f"Backtest Period: {self.portfolio_history[0]['date'].strftime('%Y-%m-%d')} to {self.portfolio_history[-1]['date'].strftime('%Y-%m-%d')}")
-        report.append(f"Number of Trading Days: {len(self.portfolio_history)}")
-        report.append(f"Number of Rebalances: {self.results['num_rebalances']}")
+        report.append(f"Период бэктеста: {self.portfolio_history[0]['date'].strftime('%Y-%m-%d')} по {self.portfolio_history[-1]['date'].strftime('%Y-%m-%d')}")
+        report.append(f"Количество торговых дней: {len(self.portfolio_history)}")
+        report.append(f"Количество ребалансировок: {self.results['num_rebalances']}")
         report.append("")
         
-        report.append("PERFORMANCE METRICS:")
+        report.append("МЕТРИКИ ПРОИЗВОДИТЕЛЬНОСТИ:")
         report.append("-" * 30)
-        report.append(f"Rebalanced Portfolio Total Return:     {self.results['total_return']:.2%}")
-        report.append(f"Buy & Hold Benchmark Total Return:     {self.results['benchmark_total_return']:.2%}")
-        report.append(f"Excess Return:                         {self.results['total_return'] - self.results['benchmark_total_return']:.2%}")
+        report.append(f"Общая доходность портфеля (с ребалансировкой):     {self.results['total_return']:.2%}")
+        report.append(f"Общая доходность бенчмарка:                      {self.results['benchmark_total_return']:.2%}")
+        report.append(f"Избыточная доходность:                           {self.results['total_return'] - self.results['benchmark_total_return']:.2%}")
         report.append("")
-        report.append(f"Rebalanced Portfolio Annualized Return: {self.results['annualized_return']:.2%}")
-        report.append(f"Buy & Hold Benchmark Annualized Return: {self.results['benchmark_annualized_return']:.2%}")
+        report.append(f"Годовая доходность портфеля (с ребалансировкой):  {self.results['annualized_return']:.2%}")
+        report.append(f"Годовая доходность бенчмарка:                    {self.results['benchmark_annualized_return']:.2%}")
         report.append("")
-        report.append(f"Rebalanced Portfolio Volatility:        {self.results['volatility']:.2%}")
-        report.append(f"Buy & Hold Benchmark Volatility:        {self.results['benchmark_volatility']:.2%}")
+        report.append(f"Волатильность портфеля (с ребалансировкой):       {self.results['volatility']:.2%}")
+        report.append(f"Волатильность бенчмарка:                         {self.results['benchmark_volatility']:.2%}")
         report.append("")
-        report.append(f"Rebalanced Portfolio Sharpe Ratio:      {self.results['sharpe_ratio']:.3f}")
-        report.append(f"Buy & Hold Benchmark Sharpe Ratio:      {self.results['benchmark_sharpe']:.3f}")
+        report.append(f"Коэффициент Шарпа портфеля (с ребалансировкой):   {self.results['sharpe_ratio']:.3f}")
+        report.append(f"Коэффициент Шарпа бенчмарка:                     {self.results['benchmark_sharpe']:.3f}")
         report.append("")
-        report.append(f"Rebalanced Portfolio Max Drawdown:      {self.results['max_drawdown']:.2%}")
-        report.append(f"Buy & Hold Benchmark Max Drawdown:      {self.results['benchmark_max_drawdown']:.2%}")
+        report.append(f"Максимальная просадка портфеля (с ребалансировкой): {self.results['max_drawdown']:.2%}")
+        report.append(f"Максимальная просадка бенчмарка:                  {self.results['benchmark_max_drawdown']:.2%}")
         report.append("")
-        report.append(f"Portfolio Alpha:                        {self.results['alpha']:.3f}")
-        report.append(f"Portfolio Beta:                         {self.results['beta']:.3f}")
-        report.append(f"Information Ratio:                      {self.results['information_ratio']:.3f}")
+        report.append(f"Альфа портфеля:                                   {self.results['alpha']:.3f}")
+        report.append(f"Бета портфеля:                                    {self.results['beta']:.3f}")
+        report.append(f"Информационное соотношение:                      {self.results['information_ratio']:.3f}")
         report.append("")
         
         if self.rebalance_history:
-            report.append("REBALANCING EVENTS:")
+            report.append("СОБЫТИЯ РЕБАЛАНСИРОВКИ:")
             report.append("-" * 30)
-            for i, event in enumerate(self.rebalance_history[:5]):  # Show first 5 events
-                report.append(f"Event {i+1}: {event['date'].strftime('%Y-%m-%d')}, Transaction Cost: {event['transaction_cost']:.3%}")
+            for i, event in enumerate(self.rebalance_history[:5]):  # Показать первые 5 событий
+                report.append(f"Событие {i+1}: {event['date'].strftime('%Y-%m-%d')}, Транзакционные издержки: {event['transaction_cost']:.3%}")
             if len(self.rebalance_history) > 5:
-                report.append(f"... and {len(self.rebalance_history) - 5} more events")
+                report.append(f"... и еще {len(self.rebalance_history) - 5} событий")
         
         report.append("")
         report.append("="*60)
