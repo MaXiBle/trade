@@ -7,16 +7,16 @@ import pickle
 from datetime import datetime
 
 # Add the project root to the path
-sys.path.append('C:/Users/admin/PycharmProjects/trade/trading_agent_v2')
-pathh = 'C:/Users/admin//PycharmProjects/trade/trading_agent_v2/'
+sys.path.append('/workspace')
+pathh = '/workspace/'
 
-from trading_agent_v2.utils.data_utils import prepare_data, get_feature_names
-from trading_agent_v2.envs.trading_env import TradingEnv
+from utils.data_utils import prepare_data, get_feature_names
+from envs.trading_env import TradingEnv
 from stable_baselines3 import SAC, PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv
-from trading_agent_v2.utils.reward_utils import get_risk_adjusted_reward
+from utils.reward_utils import get_risk_adjusted_reward
 
 
 class TrainingLoggerCallback(BaseCallback):
@@ -89,7 +89,7 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
             tau=config['model']['tau'],
             ent_coef=config['model']['ent_coef'],
             verbose=1,
-            tensorboard_log=f"/workspace/trading_agent_v2/logs/sac_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            tensorboard_log=f"/workspace/logs/sac_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         )
     elif algorithm == 'PPO':
         print("Initializing PPO agent...")
@@ -101,7 +101,7 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
             learning_rate=config['model']['learning_rate'],
             gamma=config['model']['gamma'],
             verbose=1,
-            tensorboard_log=f"/workspace/trading_agent_v2/logs/ppo_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            tensorboard_log=f"/workspace/logs/ppo_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         )
     else:
         raise ValueError(f"Unsupported algorithm: {algorithm}")
@@ -109,8 +109,8 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
     # Set up evaluation callback
     eval_callback = EvalCallback(
         eval_env,
-        best_model_save_path='/workspace/trading_agent_v2/models/best_model',
-        log_path='/workspace/trading_agent_v2/logs/',
+        best_model_save_path='/workspace/models/best_model',
+        log_path='/workspace/logs/',
         eval_freq=config['training']['eval_freq'],
         deterministic=True,
         render=False
@@ -128,12 +128,12 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
     )
     
     # Save the trained model
-    model_save_path = f'/workspace/trading_agent_v2/models/{algorithm}_trading_agent_final'
+    model_save_path = f'/workspace/models/{algorithm}_trading_agent_final'
     model.save(model_save_path)
     print(f"Model saved to {model_save_path}")
     
     # Save the environment for later use
-    env_save_path = f'/workspace/trading_agent_v2/models/training_env.pkl'
+    env_save_path = f'/workspace/models/training_env.pkl'
     with open(env_save_path, 'wb') as f:
         pickle.dump(env, f)
     print(f"Training environment saved to {env_save_path}")
@@ -143,8 +143,8 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
 
 if __name__ == "__main__":
     # Create logs and models directories if they don't exist
-    os.makedirs('/workspace/trading_agent_v2/logs', exist_ok=True)
-    os.makedirs('/workspace/trading_agent_v2/models', exist_ok=True)
+    os.makedirs('/workspace/logs', exist_ok=True)
+    os.makedirs('/workspace/models', exist_ok=True)
     
     # Train the agent
     trained_model, training_env, test_data = train_agent()

@@ -2,7 +2,7 @@
 Simple test to verify the trading agent v2.0 system works correctly
 """
 import sys
-sys.path.append('/workspace/trading_agent_v2')
+sys.path.append('/workspace')
 
 import pandas as pd
 import numpy as np
