@@ -6,21 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="be9c1e00-d5cd-4c92-b145-a3f185c2a01f" name="Changes" comment="1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/backtest_demo.py" beforeDir="false" afterPath="$PROJECT_DIR$/portfolio_management_system/backtest_demo.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/config/default_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config/default_config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/docs/quick_start.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/quick_start.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/docs/system_architecture.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/system_architecture.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/backtester.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backtester.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/data_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/portfolio_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/portfolio_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/rebalancing_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rebalancing_engine.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/src/risk_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/risk_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/portfolio_management_system/tests/test_portfolio_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_portfolio_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simple_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/analyze_results.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/environments/trading_env.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/indicators/indicator_selector.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/models/ppo_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/train_agent.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent/utils/data_processor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/trading_agent_v2/scripts/train_agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/trading_agent_v2/scripts/train_agent.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,10 +49,15 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python tests.Python tests in simple_test.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_agent.py.executor&quot;: &quot;Run&quot;,
     &quot;Python tests.Python tests in test_portfolio_manager.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python.analyze_results.executor&quot;: &quot;Run&quot;,
     &quot;Python.backtest_demo.executor&quot;: &quot;Run&quot;,
     &quot;Python.setup (1).executor&quot;: &quot;Run&quot;,
     &quot;Python.setup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.train_agent (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.train_agent.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -69,8 +69,8 @@
       <recent name="C:\Users\admin\PycharmProjects\trade" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.backtest_demo">
-    <configuration name="backtest_demo" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.train_agent (1)">
+    <configuration name="analyze_results" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="trade" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -79,11 +79,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/portfolio_management_system" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trading_agent" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/portfolio_management_system/backtest_demo.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trading_agent/analyze_results.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -92,7 +92,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="setup (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="train_agent (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="trade" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -101,11 +101,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trading_agent_v2/scripts" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/setup.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trading_agent_v2/scripts/train_agent.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -114,7 +114,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="setup" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="train_agent" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="trade" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -123,11 +123,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/portfolio_management_system" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/trading_agent" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\admin\PycharmProjects\trade\setup.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/trading_agent/train_agent.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -136,7 +136,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests in test_portfolio_manager.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests in simple_test.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="trade" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -147,16 +147,32 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/tests/test_portfolio_manager.py&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/simple_test.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_agent.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="trade" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/test_agent.py&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.backtest_demo" />
-        <item itemvalue="Python.setup (1)" />
-        <item itemvalue="Python tests.Python tests in test_portfolio_manager.py" />
-        <item itemvalue="Python.setup" />
+        <item itemvalue="Python.train_agent (1)" />
+        <item itemvalue="Python tests.Python tests in test_agent.py" />
+        <item itemvalue="Python tests.Python tests in simple_test.py" />
+        <item itemvalue="Python.train_agent" />
+        <item itemvalue="Python.analyze_results" />
       </list>
     </recent_temporary>
   </component>
@@ -183,10 +199,19 @@
       <option name="project" value="LOCAL" />
       <updated>1767977696732</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="1">
+      <option name="closed" value="true" />
+      <created>1768044962031</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1768044962031</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merge pull request #3 from MaXiBle/qwen-code-9527d5a9-a49f-4604-9de0-38f3f1479d9f&#10;&#10;Update from task 9527d5a9-a49f-4604-9de0-38f3f1479d9f" />
     <MESSAGE value="1" />
     <option name="LAST_COMMIT_MESSAGE" value="1" />
   </component>

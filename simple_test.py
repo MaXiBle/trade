@@ -5,6 +5,9 @@ without PyTorch dependencies initially
 """
 
 import sys
+
+from trading_agent.environments.trading_env import TradingEnv
+
 sys.path.append('/workspace')
 
 import warnings

@@ -21,7 +21,7 @@ def test_components():
         # Fetch sample data
         import yfinance as yf
         ticker = yf.Ticker("AAPL")
-        sample_data = ticker.history(period="1mo", interval="1d")
+        sample_data = ticker.history(period="2y", interval="1d")
         
         # Calculate indicators
         processed_data = dp.calculate_technical_indicators(sample_data)
