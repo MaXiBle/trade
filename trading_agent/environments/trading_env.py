@@ -65,7 +65,8 @@ class TradingEnv(gym.Env):
         """Reset the environment to initial state"""
         super().reset(seed=seed)
         
-        self.current_step = self.lookback_window
+        # Make sure current_step doesn't exceed data length
+        self.current_step = min(self.lookback_window, len(self.data) - 1)
         self.balance = self.initial_balance
         self.position_size = 0
         self.shares_held = 0
@@ -82,8 +83,11 @@ class TradingEnv(gym.Env):
     
     def _get_observation(self) -> np.ndarray:
         """Get current observation from environment"""
-        start_idx = max(0, self.current_step - self.lookback_window)
-        end_idx = self.current_step
+        # Ensure current_step is within bounds
+        current_step_safe = min(self.current_step, len(self.data) - 1)
+        
+        start_idx = max(0, current_step_safe - self.lookback_window)
+        end_idx = current_step_safe
         
         # Get feature window
         numeric_cols = self.data.select_dtypes(include=[np.number]).columns.tolist()
@@ -96,7 +100,7 @@ class TradingEnv(gym.Env):
             features = np.vstack([padding, features])
         
         # Add portfolio state features
-        current_price = self.data['Close'].iloc[self.current_step]
+        current_price = self.data['Close'].iloc[current_step_safe]
         portfolio_features = np.array([
             self.balance / self.initial_balance,  # Normalized balance
             self.position_size,                   # Current position size
@@ -122,8 +126,9 @@ class TradingEnv(gym.Env):
         self.actions_history.append(action)
         self.positions_history.append(self.position_size)
         
-        # Get current price
-        current_price = self.data['Close'].iloc[self.current_step]
+        # Get current price - ensure current_step is within bounds
+        current_step_safe = min(self.current_step, len(self.data) - 1)
+        current_price = self.data['Close'].iloc[current_step_safe]
         prev_portfolio_value = self.balance + self.shares_held * current_price
         
         # Calculate trade size based on action
@@ -216,7 +221,9 @@ class TradingEnv(gym.Env):
     
     def _calculate_risk_adjustment(self) -> float:
         """Calculate risk-based reward adjustment"""
-        current_portfolio_value = self.balance + self.shares_held * self.data['Close'].iloc[self.current_step]
+        # Ensure current_step is within bounds
+        current_step_safe = min(self.current_step, len(self.data) - 1)
+        current_portfolio_value = self.balance + self.shares_held * self.data['Close'].iloc[current_step_safe]
         
         # Drawdown penalty
         max_portfolio = max(self.portfolio_values) if self.portfolio_values else self.initial_balance
@@ -264,7 +271,9 @@ class TradingEnv(gym.Env):
     
     def render(self, mode='human'):
         """Render the environment state"""
-        current_price = self.data['Close'].iloc[self.current_step]
+        # Ensure current_step is within bounds
+        current_step_safe = min(self.current_step, len(self.data) - 1)
+        current_price = self.data['Close'].iloc[current_step_safe]
         portfolio_value = self.balance + self.shares_held * current_price
         
         print(f'Step: {self.current_step}')
