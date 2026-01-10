@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Add the project root to the path
-sys.path.append('/workspace')
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
 
 from utils.data_utils import prepare_data
 from envs.trading_env import TradingEnv
@@ -25,7 +26,7 @@ def load_config(config_path: str) -> dict:
     return config
 
 
-def evaluate_agent(model_path: str, config_path: str = '/workspace/config/config.yaml', 
+def evaluate_agent(model_path: str, config_path: str = os.path.join(project_root, 'config/config.yaml'), 
                    test_data: pd.DataFrame = None):
     """
     Evaluate the trained agent on out-of-sample data
@@ -101,8 +102,8 @@ def evaluate_agent(model_path: str, config_path: str = '/workspace/config/config
     }
     
     # Save evaluation report
-    report_path = f"/workspace/results/evaluation_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    os.makedirs("/workspace/results", exist_ok=True)
+    report_path = os.path.join(project_root, f"results/evaluation_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    os.makedirs(os.path.join(project_root, "results"), exist_ok=True)
     
     import json
     with open(report_path, 'w') as f:
@@ -144,7 +145,7 @@ def plot_equity_curve(cumulative_returns, test_data, metrics):
     plt.grid(True, alpha=0.3)
     
     # Save plot
-    plot_path = f"/workspace/results/equity_curve_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    plot_path = os.path.join(project_root, f"results/equity_curve_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
     plt.savefig(plot_path)
     plt.show()
     print(f"Equity curve plot saved to: {plot_path}")
@@ -205,13 +206,13 @@ def plot_trade_log(trades_log, test_data):
     plt.tight_layout()
     
     # Save plot
-    plot_path = f"/workspace/results/trade_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    plot_path = os.path.join(project_root, f"results/trade_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
     plt.savefig(plot_path)
     plt.show()
     print(f"Trade analysis plot saved to: {plot_path}")
 
 
-def walk_forward_analysis(config_path: str = '/workspace/config/config.yaml'):
+def walk_forward_analysis(config_path: str = os.path.join(project_root, 'config/config.yaml')):
     """
     Perform walk-forward analysis over multiple time periods
     """
@@ -266,7 +267,7 @@ def walk_forward_analysis(config_path: str = '/workspace/config/config.yaml'):
         
         # Load the trained model
         algorithm = config['model']['algorithm']
-        model_path = f'/workspace/models/{algorithm}_trading_agent_final.zip'
+        model_path = os.path.join(project_root, f"models/{algorithm}_trading_agent_final.zip")
         
         if os.path.exists(model_path):
             if algorithm == 'SAC':
@@ -331,10 +332,10 @@ def walk_forward_analysis(config_path: str = '/workspace/config/config.yaml'):
 
 if __name__ == "__main__":
     # Create results directory
-    os.makedirs('/workspace/results', exist_ok=True)
+    os.makedirs(os.path.join(project_root, 'results'), exist_ok=True)
     
     # Evaluate the agent
-    model_path = '/workspace/models/SAC_trading_agent_final'  # Default path
+    model_path = os.path.join(project_root, 'models/SAC_trading_agent_final')  # Default path
     if not os.path.exists(model_path + '.zip'):
         # If .zip doesn't exist, try without extension
         if os.path.exists(model_path):
