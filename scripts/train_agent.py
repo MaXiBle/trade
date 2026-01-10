@@ -17,6 +17,7 @@ from stable_baselines3 import SAC, PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.callbacks import EvalCallback, BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.logger import configure
 from utils.reward_utils import get_risk_adjusted_reward
 
 
@@ -32,6 +33,30 @@ class TrainingLoggerCallback(BaseCallback):
         # Log training metrics periodically
         if self.n_calls % 1000 == 0:
             print(f"Step {self.num_timesteps}: Training in progress...")
+        return True
+
+
+class NumericalStabilityCallback(BaseCallback):
+    """
+    Custom callback to check for numerical stability during training
+    """
+    def __init__(self, verbose=0):
+        super(NumericalStabilityCallback, self).__init__(verbose)
+
+    def _on_step(self) -> bool:
+        # Check for any NaN or infinite values in the policy parameters
+        if hasattr(self.model, 'actor') and self.model.actor is not None:
+            for param in self.model.actor.parameters():
+                if torch.isnan(param).any() or torch.isinf(param).any():
+                    print(f"Warning: NaN or Inf detected in actor parameters at step {self.num_timesteps}")
+                    return False  # Stop training
+        
+        if hasattr(self.model, 'critic') and self.model.critic is not None:
+            for param in self.model.critic.parameters():
+                if torch.isnan(param).any() or torch.isinf(param).any():
+                    print(f"Warning: NaN or Inf detected in critic parameters at step {self.num_timesteps}")
+                    return False  # Stop training
+        
         return True
 
 
@@ -89,6 +114,12 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
             gamma=config['model']['gamma'],
             tau=config['model']['tau'],
             ent_coef=config['model']['ent_coef'],
+            gradient_steps=1,  # Reduce gradient steps to help with stability
+            train_freq=1,      # Increase training frequency
+            target_update_interval=1,  # Update target networks more frequently
+            learning_starts=1000,      # Start learning after 1000 steps
+            use_sde=True,              # Use State Dependent Exploration for better exploration
+            sde_sample_freq=64,        # How often to sample SDE
             verbose=1,
             tensorboard_log=os.path.join(project_root, f"logs/sac_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         )
@@ -117,14 +148,20 @@ def train_agent(config_path: str = pathh + 'config/config.yaml'):
         render=False
     )
     
-    # Custom logger callback
+    # Custom callbacks
     logger_callback = TrainingLoggerCallback(verbose=1)
+    stability_callback = NumericalStabilityCallback(verbose=1)
     
     # Train the model
     print(f"Starting training with {algorithm} for {config['training']['total_timesteps']} timesteps...")
+    
+    # Configure the logger to capture more detailed information
+    log_dir = os.path.join(project_root, f"logs/sac_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
+    model.set_logger(configure(log_dir, ["stdout", "csv", "tensorboard"]))
+    
     model.learn(
         total_timesteps=config['training']['total_timesteps'],
-        callback=[eval_callback, logger_callback],
+        callback=[eval_callback, logger_callback, stability_callback],
         progress_bar=True
     )
     
