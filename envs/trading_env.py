@@ -110,8 +110,8 @@ class TradingEnv(gym.Env):
         current_price = self.data['close'].iloc[self.current_step]
         
         # Current position value
+        prev_unrealized_pnl = self.unrealized_pnl
         if self.position_size != 0:
-            prev_unrealized_pnl = self.unrealized_pnl
             self.unrealized_pnl = (current_price - self.avg_entry_price) * (self.position_size / self.avg_entry_price)
             realized_pnl_change = self.unrealized_pnl - prev_unrealized_pnl
         else:
