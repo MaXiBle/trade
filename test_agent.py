@@ -4,7 +4,9 @@ Simple test script to verify the trading agent components work correctly
 """
 
 import sys
-sys.path.append('/workspace')
+import os
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(project_root)
 
 import warnings
 warnings.filterwarnings('ignore')

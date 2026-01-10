@@ -5,10 +5,12 @@ without PyTorch dependencies initially
 """
 
 import sys
+import os
+
+project_root = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(project_root)
 
 from envs.trading_env import TradingEnv
-
-sys.path.append('/workspace')
 
 import warnings
 warnings.filterwarnings('ignore')
