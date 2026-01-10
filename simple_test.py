@@ -6,7 +6,7 @@ without PyTorch dependencies initially
 
 import sys
 
-from trading_agent.environments.trading_env import TradingEnv
+from envs.trading_env import TradingEnv
 
 sys.path.append('/workspace')
 
@@ -40,7 +40,7 @@ def test_basic_components():
         
         # Test 2: Trading Environment (without PyTorch parts initially)
         print("\n2. Testing Trading Environment...")
-        from trading_agent.environments.trading_env import TradingEnv
+        from envs.trading_env import TradingEnv
         env = TradingEnv(processed_data, initial_balance=10000)
         
         obs, info = env.reset()

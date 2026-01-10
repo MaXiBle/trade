@@ -15,7 +15,7 @@ import argparse
 from datetime import datetime
 
 # Add the project root to the path
-sys.path.append('/workspace/trading_agent_v2')
+sys.path.append('/workspace')
 
 from scripts.train_agent import train_agent
 from scripts.evaluate_agent import evaluate_agent, walk_forward_analysis
@@ -26,7 +26,7 @@ from stable_baselines3 import SAC, PPO
 
 def main():
     parser = argparse.ArgumentParser(description='Run Trading Agent v2.0 Pipeline')
-    parser.add_argument('--config', type=str, default='/workspace/trading_agent_v2/config/config.yaml',
+    parser.add_argument('--config', type=str, default='/workspace/config/config.yaml',
                         help='Path to config file')
     parser.add_argument('--skip-training', action='store_true',
                         help='Skip training and only run evaluation')
@@ -55,7 +55,7 @@ def main():
             config = yaml.safe_load(file)
         
         algorithm = config['model']['algorithm']
-        model_path = f'/workspace/trading_agent_v2/models/{algorithm}_trading_agent_final'
+        model_path = f'/workspace/models/{algorithm}_trading_agent_final'
         
         if os.path.exists(model_path + '.zip'):
             model_path = model_path + '.zip'
