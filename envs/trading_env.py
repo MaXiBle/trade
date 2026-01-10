@@ -89,16 +89,23 @@ class TradingEnv(gym.Env):
         flattened_features = combined_features.flatten()
         
         # Append account information
+        current_price = self.data['close'].iloc[self.current_step] if self.current_step < len(self.data) else 1.0
+        relative_avg_price = self.avg_entry_price / current_price if self.avg_entry_price != 0 and current_price != 0 else 0
+        
         account_info = np.array([
             self.balance / self.initial_balance,  # Normalized balance
             self.equity / self.initial_balance,   # Normalized equity
             self.unrealized_pnl / self.initial_balance,  # Normalized unrealized pnl
             self.position_size / self.initial_balance,   # Normalized position size
-            self.avg_entry_price / self.data['close'].iloc[self.current_step] if self.avg_entry_price != 0 else 0  # Relative to current price
+            relative_avg_price  # Relative to current price
         ])
         
         # Combine features and account info
         observation = np.concatenate([flattened_features, account_info]).astype(np.float32)
+        
+        # Ensure all values are finite to prevent NaN propagation to the neural network
+        observation = np.nan_to_num(observation, nan=0.0, posinf=1e5, neginf=-1e5)
+        
         return observation
     
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, float, bool, bool, dict]:
@@ -111,7 +118,7 @@ class TradingEnv(gym.Env):
         
         # Current position value
         prev_unrealized_pnl = self.unrealized_pnl
-        if self.position_size != 0:
+        if self.position_size != 0 and self.avg_entry_price != 0:
             self.unrealized_pnl = (current_price - self.avg_entry_price) * (self.position_size / self.avg_entry_price)
             realized_pnl_change = self.unrealized_pnl - prev_unrealized_pnl
         else:
@@ -121,7 +128,7 @@ class TradingEnv(gym.Env):
         target_position_pct = np.clip(action[0], -1.0, 1.0)
         
         # Check for stop loss/take profit conditions
-        if abs(self.position_size) > 0:
+        if abs(self.position_size) > 0 and self.avg_entry_price != 0:
             pct_change = abs(current_price - self.avg_entry_price) / self.avg_entry_price
             
             # Stop loss check
@@ -176,7 +183,10 @@ class TradingEnv(gym.Env):
                             else:
                                 self.avg_entry_price = current_price
                 # Calculate unrealized PnL based on new position
-                self.unrealized_pnl = (current_price - self.avg_entry_price) * (self.position_size / self.avg_entry_price) if self.avg_entry_price != 0 else 0
+                if self.avg_entry_price != 0:
+                    self.unrealized_pnl = (current_price - self.avg_entry_price) * (self.position_size / self.avg_entry_price)
+                else:
+                    self.unrealized_pnl = 0.0
             else:
                 # Closed position
                 self.avg_entry_price = 0.0
@@ -189,6 +199,11 @@ class TradingEnv(gym.Env):
             old_equity = self.balance + prev_unrealized_pnl
             self.equity = self.balance + self.unrealized_pnl
             reward = self.equity - old_equity
+            
+            # Ensure reward is finite to avoid NaN propagation
+            if not np.isfinite(reward):
+                reward = 0.0
+                print(f"Warning: Non-finite reward detected at step {self.current_step}, setting to 0.0")
             
             # Log the trade if position changed significantly
             if abs(position_change_value) > self.initial_balance * 0.001:  # Only log significant changes
